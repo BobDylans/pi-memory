@@ -34,6 +34,15 @@ updated: "2026-08-11"
 }
 ```
 
+## ocr (open-code-review) 配置（~/.opencodereview/config.json）
+- provider: **enncloud**（非 deepseek，用 enncloud 代理）
+- model: glm-5.2-fast
+- url: https://fastai.enncloud.cn/v1
+- protocol: openai
+- 连通性测试通过，13秒完成审查
+- session 存储在 ~/.opencodereview/sessions/<repo>/
+- 用 `ocr session list` / `ocr session comments --json <id>` 读取历史
+
 ## Codex 配置（~/.codex/config.toml）
 - 用官方脚本 `bash <(curl -fsSL https://cdn.deepseek.com/api-docs/codex-deepseek-setup.sh)` 配置
 - 会写入 `~/.codex/models.json`（含 base_instructions 的完整 model build）
