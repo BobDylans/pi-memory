@@ -1,0 +1,1 @@
+dotfiles 仓库的 pi-agent package 不通过 stow 管理（stow --adopt 会冲突，因 ~/.pi/agent/ 含运行时目录）。pi-agent 配置是手动软链：~/.pi/agent/ 下 agents/AGENTS.md/extensions/prompts/skills/workflows/zentui.json 软链指向 ~/Projects/dotfiles/pi-agent/.pi/agent/。重命名 dotfiles 仓库后这些软链会断（指向旧路径），需手动修：把软链目标里的旧仓库名替换成新名。npm（扩展安装目录）和 themes 不软链（本地独立）。models.json 含密钥不入库。 <!-- created=2026-07-16, last=2026-07-16 -->

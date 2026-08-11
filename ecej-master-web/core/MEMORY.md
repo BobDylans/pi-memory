@@ -1,0 +1,1 @@
+ecej-master-web 项目：浙江一体化页面模板位于 /home/ivan/Projects/work/ecej-master-web/src/main/resources/templates/master/govtZj.html（注意不是 zjManage.html）。模板引擎 Thymeleaf，前端 Element UI。HTML 按钮文字不要用全角空格分隔（如「退 出」→「退出」），图标和文字间距通过 CSS `.el-button i + span { margin-left: 2px }` 收紧。 <!-- created=2026-08-07, last=2026-08-07 -->

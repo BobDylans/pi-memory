@@ -1,0 +1,17 @@
+当前项目：pi-mono（@earendil-works/pi-mono），Pi Agent Harness 的本地 checkout。monorepo 结构，4 个核心包：packages/ai（统一多供应商 LLM API）、packages/agent（通用 Agent 运行时：Agent 类、agentLoop、工具执行、事件流、会话/压缩）、packages/coding-agent（交互式编码代理 CLI 主产品，含扩展系统/工具集/四种运行模式 interactive·print·RPC·SDK）、packages/tui（终端 UI 框架，差分渲染+同步输出）。TypeScript，Node strip-only 模式（禁 enum/namespace/parameter properties）。构建 npm run build。Ivan 以此项目为学习材料，目标是从 ai 模块开始系统学习 agent 开发流程。 <!-- created=2026-07-07, last=2026-07-07 -->
+§
+pi-ai 学习笔记：Context 类似 LangGraph state（systemPrompt + messages + tools），但只有 push 无 reducer/合并协议——单线程顺序调用，框架不管覆写。Model 是纯数据（规格表：id/api/provider/baseUrl/cost/contextWindow...），从属于 Provider。Models 持有 Provider[]，Provider 通过 getModels() 拥有 Model。同一物理模型（如 DeepSeek V3）经不同供应商（官方 vs OpenRouter）是两个不同 Model 实例（provider/baseUrl/cost 不同）。9 种 KnownApi 网络协议层：openai-completions/openai-responses/anthropic-messages/google-generative-ai/bedrock-converse-stream 等，各供应商映射到其中一种。事件分两层：供应商原始 SSE → pi-ai 翻译成统一 12 种 AssistantMessageEvent（text/thinking/toolcall 各 start/delta/end + start/done/error）。5 种 StopReason：stop/length/toolUse/error/aborted，是 agentLoop 控制信号。消息内容块：输入侧 5 种（TextContent/ImageContent/ThinkingContent/ToolCall/ToolResult），输出侧无 image 事件（图片生成走独立 ImagesModels API）。 <!-- created=2026-07-07, last=2026-07-07 -->
+§
+pi-mono 仓库的 .gitignore 已加入 graphify-out/（graphify 输出目录，本地生成不入版本控制）。 <!-- created=2026-07-08, last=2026-07-08 -->
+§
+pi 流体系统：统一用自定义 EventStream 类（packages/ai/src/utils/event-stream.ts），不用 Web ReadableStream。EventStream<T, R> implements AsyncIterable<T>，内部用 queue/waiting 队列连接生产者-消费者，.result() 拿最终结果。AssistantMessageEventStream extends EventStream<AssistantMessageEvent, AssistantMessage>（结束规则：done/error 事件），provider 层 stream() 返回 new AssistantMessageEventStream()。agent 层用 EventStream<AgentEvent, AgentMessage[]>（结束规则：agent_end 事件）。两层同属 EventStream 家族，只是事件类型和结束规则不同。
+
+三层流架构：① provider 层（token 级事件 text_delta/toolcall_delta/done）→ ② AgentSession 层 for await 消费 provider 流，翻译成 message_start/message_update/message_end（不攒 token，边收边向上 emit）→ ③ createAgentStream 层（agent 级事件 agent_start/agent_end）。每层通过 for await 读下层流、通过 emit/stream.push 推上层流。
+
+provider 路由：model.api 字段决定走哪个 API 协议实现（如 "openai-completions"），model.provider 字段决定用哪套凭证（API key/OAuth/baseUrl）。apiFor(model) 查 apiProviderRegistry Map 找到 ProviderStreams 对象。内置 provider 在启动时从 BUILTIN_APIS 列表自动注册，外部 provider 通过 registerApiProvider() 手动注册。dispatch() 是路由辅助函数，找不到 provider 时返回 lazyStream 抛错。
+
+provider 实现模式（非 class，函数式）：每个 API 协议文件导出 const stream 和 const streamSimple（StreamFunction 类型），加上 api 字面量，组成 ApiProvider 对象。StreamFunction 契约：必须返回 AssistantMessageEventStream；请求/模型/运行时错误编码进流（不 throw），以 stopReason "error"/"aborted" + errorMessage 终止。streamSimple 是薄包装，委托给 stream。stream 内用 IIFE + async 包裹（因为要在同步函数体中用 await），创建 output（AssistantMessage 空骨架），push start 事件，然后 for await 消费 SSE response 逐个 push delta 事件。
+
+compat（兼容性）：getCompat(model) 返回 provider 间行为差异开关表（maxTokensField、supportsReasoningEffort、requiresToolResultName、thinkingFormat、cacheControlFormat 等）。detectCompat() 按模型自动检测，model.compat 可覆盖单项。解决同一 API 协议下不同供应商细节差异。
+
+output/partial 关系：output 是流式过程中的可变累加器（同一对象引用，content/usage 随 chunk 增长）；partial: output 是 start 事件中对 output 的快照引用；done 事件带 message（最终完整消息）。上层 AgentSession 用 response.result() 拿最终 message，替换 context.messages 中的占位 partial。 <!-- created=2026-07-08, last=2026-07-08 -->

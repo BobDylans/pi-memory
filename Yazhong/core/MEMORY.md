@@ -1,0 +1,17 @@
+**Yazhong 构建与部署**：`output: "export"` 静态导出到 Cloudflare Pages。本地构建必须带代理（下载 Google Fonts Poppins/Tajawal/Playfair）：`env http_proxy=http://127.0.0.1:7890 https_proxy=http://127.0.0.1:7890 npm run build`，否则报 `next/font: error`。部署：push 到 master 自动触发 Cloudflare Pages 构建，或手动 `npx wrangler pages deploy out/ --branch master`（需先 build）。 <!-- created=2026-08-04, last=2026-08-04 -->
+§
+**⚠️ .env 文件坑（已发生 4+ 次，最高优先级）**：`.env` 被 gitignore 不跟踪，git stash / pull --rebase / stash pop 链会丢失未跟踪文件 → 每次 pull 后必须检查重建。内容三行：`NEXT_PUBLIC_ADMIN_URL="https://admin.rimhappywoods.top"` + `NEXT_PUBLIC_SITE_URL="https://master.yazhong.pages.dev"` + `NEXT_PUBLIC_WHATSAPP_NUMBER`。**关键**：fish shell 中 `env VAR=val npm run build` 的环境变量在嵌套子进程链（npm run build → npm run prebuild && next build）中会丢失 → `getImageUrl()` 里 `process.env.NEXT_PUBLIC_ADMIN_URL` 为 undefined → 图片 404。必须用 `.env` 文件让 Next.js 构建时自动读取。验证：构建后 grep `admin.rimhappywoods.top/r2/` 出现在 HTML 说明 .env 生效；只看到 `/images/imgs/` 说明变量丢失。 <!-- created=2026-08-04, last=2026-08-04 -->
+§
+**Yazhong git 状态**：master 与 origin/master 同步。远程有 fresh-start 分支（黑金色彩实验）。black-type 已合并到 master。`.gitignore` 含：strix_runs/ + .omc/ + graphify-out/ + .env + tsconfig.tsbuildinfo + src/data/generated/。git pull --rebase 遇工作区有未暂存变更时：git stash → pull --rebase → stash pop；冲突文件手动解决后 git add → git rebase --continue。 <!-- created=2026-08-04, last=2026-08-04 -->
+§
+**Yazhong 技术架构**：
+- **i18n**：LocaleProvider (React Context) + en.ts/ar.ts 翻译文件，客户端组件用 `useLocale().t()`。**服务器组件**（含 generateMetadata/generateStaticParams 的 products/[slug] | blog/[slug] page.tsx）不能直接用 useLocale()（客户端 hook），需提取客户端子组件（ProductDetailClient.tsx/BlogDetailClient.tsx）处理翻译。翻译键命名：trustXxx/blogsXxx/navXxx/pdXxx/blogXxx。所有页面 `<main id="main-content">` 配合 layout.tsx 的 skip-to-content 链接。
+- **RTL**：next/font/google 加载 Tajawal（layout.tsx 三字体 Poppins+Tajawal+Playfair），globals.css `[dir="rtl"]` 切 font-sans 从 Poppins 到 Tajawal，内联脚本从 localStorage 读语言防 FOUC。Tailwind 用逻辑属性 start/end 替代 left/right，`rounded-s-none` 替代 `rounded-l-none`。
+- **颜色 token**：WhatsApp 色统一为 CSS token `--whatsapp`/`--whatsapp-hover`（替换 10+ 文件硬编码 #25D366/#22c35e）；ProductCard badge 用 `var(--accent)`/`var(--destructive)`。
+- **图片系统**：`getImageUrl()`（src/lib/images.ts）是枢纽，两种路径——本地静态 `/images/xxx.jpg`（需 git 跟踪）和 R2 代理 `/images/imgs/xxx`，后者通过 admin Worker 代理到 `${NEXT_PUBLIC_ADMIN_URL}/r2/...`。所有产品图片走 R2 代理。
+- **SEO**：src/lib/schema.tsx 含 5 种 JSON-LD（Organization/Product/Article/BreadcrumbList/FAQPage）；各页面有独立 metadata + canonical + OG/Twitter card。SITE_URL 用 `NEXT_PUBLIC_SITE_URL` 环境变量。
+- **产品数据**：products.ts 砍掉 `require("fs")` 运行时降级逻辑（会导致服务端/客户端数据不一致 → 404，SSG 页面用 prod-01 链接而客户端组件用降级数据 id=1/2/3），改为构建时生成 products-data.ts 直接 import。静态导出下 useSearchParams 需配合 useEffect 同步 activeCategory（useState 初始值只在首次挂载生效，同路由 query 变化不更新）。
+- **组件清单**：ProductConfigurator（颜色/材质/缝线选择器，invisible placeholder 防布局跳动）、HowItWorks、CustomerGallery、ProductDetails、SectionHeadings/FeaturedSection/InsightsSection/ReviewsSection、MobileStickyBar（移动端底部 WhatsApp CTA，滚动超 400px 出现，Thumb Zone 优化，桌面端 lg:hidden）、BuyNowButton/InquiryForm/ProductFAQ/ProductSearch（远程合并引入）。Header 有滚动隐藏/显示。产品列表页按分类分组渲染（H2 + 锚点）。
+- **无障碍**：aria-label 翻译、触摸目标 ≥44px（Header 汉堡/Configurator 色板/Gallery 轮播/Footer 社交/HeroBanner select/分类按钮）。
+- **杂项**：graphify 图谱 406 节点/509 边/48 社区；.omc/ 已从 git 移除并 gitignore；globals.css 新增 `.text-warm-gradient`；IconFeatures 第5卡片（24/7 Support）移动端 col-span-2 居中；移动端 ProductCard 2列布局（padding/gap 减小）；Playfair Display 用作 `--font-heading`。 <!-- created=2026-08-04, last=2026-08-04 -->
+§
