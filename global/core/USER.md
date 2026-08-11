@@ -23,6 +23,7 @@ updated: "2026-08-11"
 - 偏好中文交流，技术术语可用英文
 - 喜欢直接执行（YOLO 模式），不需要反复确认
 - 改代码后告知改了什么，由用户自行 git 提交（禁止自动 git commit/push）
+- **例外**：记忆仓库 `~/.pi/memory-md`（pi-memory-md 记忆系统）可自主 commit + push 管理，无需询问；项目代码仓库一律不自动 push
 
 ## Agent 使用偏好
 - 主力 Agent：pi（多 provider 灵活切换）
