@@ -2,3 +2,4 @@
 {"id":"b1c42267-da7b-46eb-ab21-1d5524f80c4a","timestamp":"2026-08-12T05:39:42.358Z","name":"session/resume","type":"session","sessionId":"019fd995-f3dc-76d7-be5e-e68683c283a6","sessionEntryId":"1dba1e61"}
 {"id":"3a9265c1-2b91-4773-8743-271e3f5c5464","timestamp":"2026-08-12T06:11:37.578Z","name":"session/resume","type":"session","sessionId":"019fd995-f3dc-76d7-be5e-e68683c283a6","sessionEntryId":"121478bc"}
 {"id":"41880151-313d-4dee-a320-9ec0d341716d","timestamp":"2026-08-12T06:18:25.260Z","name":"handoff/keyword-pi-141820","type":"handoff","meta":{"summary":"更新 memory 和 herdr skill，记录 mvn 长任务用 Herdr 跑的偏好","purpose":"配置偏好记录","trigger":"keyword","keywords":["pi"]},"sessionId":"019fd995-f3dc-76d7-be5e-e68683c283a6","sessionEntryId":"e12ff428"}
+{"id":"f946ead5-7c5f-48f8-8dbf-7583d0c2a5cd","timestamp":"2026-08-17T00:47:32.743Z","name":"session/resume","type":"session","sessionId":"01a00d30-15cc-7646-afd7-8b8d46dadfd0","sessionEntryId":"5851adfa"}
