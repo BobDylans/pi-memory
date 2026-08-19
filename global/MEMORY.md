@@ -54,3 +54,6 @@ nvim 双配置并存（2026-08 确认）：默认 ~/.config/nvim/ 用 LazyVim（
 ---
 
 nvim 配置教训（2026-08）：~/.config/nvim 曾被 dotfiles stow 布局污染（混入 aria2/fish/kitty 等 40+ 无关目录，还有嵌套 nvim/、colors/dms.lua 残留），是因为 dotfiles 仓库内容被误拷贝。清理只保留 init.lua/lazy-lock.json/lazyvim.json/stylua.toml/.neoconf.json + lua/。avante.nvim 从未提交 dotfiles git，符号链接缺失时直接删（用户不需要 avante）。改 LazyVim 的 dashboard header（want IVAN 文字）折腾多次未生效（ui.lua 默认优先级高），最终放弃并还原。 <!-- created=2026-08-09, last=2026-08-09 -->
+---
+
+superpowers skill 自动触发问题已修复（2026-08-13）：pi 的 skill 是渐进式披露，上下文只有名字+描述，全文需主动 read。模型不总会主动加载（pi 文档承认 "models don't always do this"）。已在 ~/.pi/agent/AGENTS.md 加 "Skill 检查强制规则" 章节：每次任务前必须扫描 skill descriptions，匹配的（哪怕 1% 可能）先 read 全文再执行，announce "Using [skill] to [purpose]"。高频映射：构建→brainstorming、bug→systematic-debugging、写功能→TDD、执行计划→subagent-driven-development、完成→verification-before-completion。流程类 skill 优先于实现类。例外：纯问答/闲聊/查资料可不强制。 <!-- created=2026-08-13, last=2026-08-13 -->
