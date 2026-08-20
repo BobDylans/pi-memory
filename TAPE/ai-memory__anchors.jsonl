@@ -3,3 +3,5 @@
 {"id":"aa92e25f-d0f5-46ca-b175-086ed6266790","timestamp":"2026-08-19T02:13:30.708Z","name":"session/resume","type":"session","sessionId":"01a017cb-07bd-7d49-94ab-df73c1ef6776","sessionEntryId":"141afef5"}
 {"id":"79f76162-3580-4629-89ff-526db3605b36","timestamp":"2026-08-19T06:04:56.574Z","name":"session/resume","type":"session","sessionId":"01a017cb-07bd-7d49-94ab-df73c1ef6776","sessionEntryId":"e0f2304e"}
 {"id":"16ec873a-cc85-420e-ab31-2982783f8956","timestamp":"2026-08-19T07:31:23.718Z","name":"session/resume","type":"session","sessionId":"01a017cb-07bd-7d49-94ab-df73c1ef6776","sessionEntryId":"710a7304"}
+{"id":"e2fc33bc-d917-4a9f-baf2-bb4e0a0fac1d","timestamp":"2026-08-20T05:42:44.171Z","name":"session/resume","type":"session","sessionId":"01a017cb-07bd-7d49-94ab-df73c1ef6776","sessionEntryId":"710a7304"}
+{"id":"df66eefc-f7b9-4da5-9460-1bb6713c689a","timestamp":"2026-08-20T05:47:35.823Z","name":"handoff/keyword-config-134731","type":"handoff","meta":{"summary":"用户PR合并后同步本地main，fetch成功但ff-only失败需要处理分叉","purpose":"git-sync","trigger":"keyword","keywords":["config"]},"sessionId":"01a017cb-07bd-7d49-94ab-df73c1ef6776","sessionEntryId":"073d942a"}
